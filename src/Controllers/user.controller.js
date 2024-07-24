@@ -1,30 +1,6 @@
 import { USER } from "../Models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-const generateAccessTokenandRefreshToken = async (userID) => {
-  try {
-    const userExist = await USER.findById(userID);
-
-    if (!userExist) {
-      return res.status(404).json({
-        status: 404,
-        message: "User doesn't exist",
-      });
-    }
-
-    const accesstoken = userExist.generateAccessToken();
-    const refreshtoken = userExist.generateRefreshToken();
-
-    userExist.refreshtoken = refreshtoken;
-
-    await userExist.save({ validateBeforeSave: false });
-
-    return { accesstoken, refreshtoken };
-  } catch (error) {
-    console.log("Error while generating access and refreshtoken", error);
-  }
-};
-
 const registerUser = asyncHandler(async (req, res) => {
   try {
     const { firstname, lastname, email, password } = req.body;
@@ -89,13 +65,7 @@ const loginUser = asyncHandler(async (req, res) => {
       });
     }
 
-    const { accesstoken, refreshtoken } =
-      await generateAccessTokenandRefreshToken(checkUserExist?._id);
-
-    const userInfo = await USER.findById(checkUserExist?._id).select(
-      "-password -refreshtoken"
-    );
-
+    const userInfo = await USER.findById(checkUserExist?._id);
     userInfo.islogin = true;
 
     await userInfo.save();
@@ -105,17 +75,13 @@ const loginUser = asyncHandler(async (req, res) => {
       secure: true,
     };
 
-    return res
-      .status(200)
-      .cookie("accesstoken", accesstoken, options)
-      .cookie("refreshtoken", refreshtoken, options)
-      .send({
-        status: 200,
-        message: "user logged in successfully",
-        userInfo,
-        refreshtoken,
-        accesstoken,
-      });
+    return res.status(200).send({
+      status: 200,
+      message: "user logged in successfully",
+      userInfo,
+      refreshtoken,
+      accesstoken,
+    });
   } catch (error) {
     console.log("Failed to login user", error);
   }
