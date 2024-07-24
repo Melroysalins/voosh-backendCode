@@ -79,8 +79,6 @@ const loginUser = asyncHandler(async (req, res) => {
       status: 200,
       message: "user logged in successfully",
       userInfo,
-      refreshtoken,
-      accesstoken,
     });
   } catch (error) {
     console.log("Failed to login user", error);
