@@ -155,4 +155,9 @@ const taskUpdate = asyncHandler(async (req, res) => {
   }
 });
 
+const userExist = asyncHandler(async (req, res) => {
+  try {
+  } catch (error) {}
+});
+
 export { taskCreation, taskView, taskEdit, taskDelete, getAllTask, taskUpdate };
